@@ -148,7 +148,28 @@ entropy(T,wal::N) where {N<:EquationOfState}= thermodynamic(T,wal).pressure_deri
  thermodynamic(T,mu,x::NumberDivisionEquationOfState)= x.num/thermodynamic(T,mu,x.equation_of_state_2)
  thermodynamic(T,mu,x::OppositeEquationOfState)= -thermodynamic(T,mu,x.equation_of_state)
 
+ thermodynamic(T,mu,t,x::SumEquationOfState)= thermodynamic(T,mu,t,x.equation_of_state_1)+thermodynamic(T,mu,t,x.equation_of_state_2)
+ thermodynamic(T,mu,t,x::DifferenceEquationOfState)= thermodynamic(T,mu,t,x.equation_of_state_1)-thermodynamic(T,mu,t,x.equation_of_state_2)
+ thermodynamic(T,mu,t,x::ProductEquationOfState)= thermodynamic(T,mu,t,x.equation_of_state_1)*thermodynamic(T,mu,t,x.equation_of_state_2)
+ thermodynamic(T,mu,t,x::DivisionEquationOfState)= thermodynamic(T,mu,t,x.equation_of_state_1)/thermodynamic(T,mu,t,x.equation_of_state_2)
+ 
+ thermodynamic(T,mu,t,x::NumberSumEquationOfState)= x.num+thermodynamic(T,mu,t,x.equation_of_state_2)
+ thermodynamic(T,mu,t,x::NumberDifferenceEquationOfState)= x.num-thermodynamic(T,mu,t,x.equation_of_state_2)
+ thermodynamic(T,mu,t,x::NumberProductEquationOfState)= x.num*thermodynamic(T,mu,t,x.equation_of_state_2)
+ thermodynamic(T,mu,t,x::NumberDivisionEquationOfState)= x.num/thermodynamic(T,mu,t,x.equation_of_state_2)
+ thermodynamic(T,mu,t,x::OppositeEquationOfState)= -thermodynamic(T,mu,t,x.equation_of_state)
 
+ thermodynamicPhaseOne(T,mu,x::SumEquationOfState)= thermodynamicPhaseOne(T,mu,x.equation_of_state_1)+thermodynamicPhaseOne(T,mu,x.equation_of_state_2)
+ thermodynamicPhaseOne(T,mu,x::DifferenceEquationOfState)= thermodynamicPhaseOne(T,mu,x.equation_of_state_1)-thermodynamicPhaseOne(T,mu,x.equation_of_state_2)
+ thermodynamicPhaseOne(T,mu,x::ProductEquationOfState)= thermodynamicPhaseOne(T,mu,x.equation_of_state_1)*thermodynamicPhaseOne(T,mu,x.equation_of_state_2)
+ thermodynamicPhaseOne(T,mu,x::DivisionEquationOfState)= thermodynamicPhaseOne(T,mu,x.equation_of_state_1)/thermodynamicPhaseOne(T,mu,x.equation_of_state_2)
+
+ thermodynamicPhaseOne(T,mu,x::NumberSumEquationOfState)= x.num+thermodynamicPhaseOne(T,mu,x.equation_of_state_2)
+ thermodynamicPhaseOne(T,mu,x::NumberDifferenceEquationOfState)= x.num-thermodynamicPhaseOne(T,mu,x.equation_of_state_2)
+ thermodynamicPhaseOne(T,mu,x::NumberProductEquationOfState)= x.num*thermodynamicPhaseOne(T,mu,x.equation_of_state_2)
+ thermodynamicPhaseOne(T,mu,x::NumberDivisionEquationOfState)= x.num/thermodynamicPhaseOne(T,mu,x.equation_of_state_2)
+ thermodynamicPhaseOne(T,mu,x::OppositeEquationOfState)= -thermodynamicPhaseOne(T,mu,x.equation_of_state)
+ 
 
  pressure(T,mu,wal::N) where {N<:EquationOfState}= thermodynamic(T,mu,wal).pressure
 
@@ -157,6 +178,13 @@ entropy(T,wal::N) where {N<:EquationOfState}= thermodynamic(T,wal).pressure_deri
  pressure_derivative(T,mu,::Val{2},::Val{0},wal::N) where {N<:EquationOfState}= thermodynamic(T,mu,wal).pressure_hessian[1]
  pressure_derivative(T,mu,::Val{1},::Val{1},wal::N) where {N<:EquationOfState}= thermodynamic(T,mu,wal).pressure_hessian[2]
  pressure_derivative(T,mu,::Val{0},::Val{2},wal::N) where {N<:EquationOfState}= thermodynamic(T,mu,wal).pressure_hessian[3]
+
+
+ pressure_derivative(T,mu,t,::Val{1},::Val{0},wal::N) where {N<:EquationOfState}= thermodynamic(T,mu,t,wal).pressure_derivative[1]
+ pressure_derivative(T,mu,t,::Val{0},::Val{1},wal::N) where {N<:EquationOfState}= thermodynamic(T,mu,t,wal).pressure_derivative[2]
+ pressure_derivative(T,mu,t,::Val{2},::Val{0},wal::N) where {N<:EquationOfState}= thermodynamic(T,mu,t,wal).pressure_hessian[1]
+ pressure_derivative(T,mu,t,::Val{1},::Val{1},wal::N) where {N<:EquationOfState}= thermodynamic(T,mu,t,wal).pressure_hessian[2]
+ pressure_derivative(T,mu,t,::Val{0},::Val{2},wal::N) where {N<:EquationOfState}= thermodynamic(T,mu,t,wal).pressure_hessian[3]
     
 function energy_density(T,mu,wal::N) where {N<:EquationOfState}
     x=thermodynamic(T,mu,wal)

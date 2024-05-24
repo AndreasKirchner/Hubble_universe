@@ -25,15 +25,16 @@ end
 
 
 @inline  function pressure(T,x::IdealQCD) 
-    1/(4*3*2) *x.a1 *T^4 *invfmGeV3
+    1/(4*3*2) *x.a1 *T^4 *fmGeV#*invfmGeV3
 end
 
 @inline  function pressure(T,μ,x::IdealQCD) 
-    invfmGeV3*(1/(4*3*2) *x.a1 *T^4 +1/4*x.a2 * T^2*μ^2 +1/(4*3*2) *x.a3* μ^4)
+    #invfmGeV3*(1/(4*3*2) *x.a1 *T^4 +1/4*x.a2 * T^2*μ^2 +1/(4*3*2) *x.a3* μ^4)
+    (1/(4*3*2) *x.a1 *T^4 +1/4*x.a2 * T^2*μ^2 +1/(4*3*2) *x.a3* μ^4)
 end
 
 @inline  function pressure_derivative(T,μ,::Val{1},::Val{0},x::IdealQCD ) 
-    (1/(3*2) *x.a1 *T^3 +2/4*x.a2 * T*μ^2 )*invfmGeV3
+    (1/(3*2) *x.a1 *T^3 +2/4*x.a2 * T*μ^2 )#*invfmGeV3
 end
 
 @inline  function pressure_derivative(T,::Val{1},x::IdealQCD ) 
@@ -42,28 +43,28 @@ end
 
 @inline @fastmath function pressure_derivative(T,μ,::Val{2},::Val{0},x::IdealQCD ) 
     
-   ( 1/2 *x.a1 *T^2 +2/4*x.a2 *μ^2 )*invfmGeV3
+   ( 1/2 *x.a1 *T^2 +2/4*x.a2 *μ^2 )#*invfmGeV3
 end
 
 
 
 @inline @fastmath function pressure_derivative(T,::Val{2},x::IdealQCD ) 
     
-    1/2 *x.a1 *T^2 *invfmGeV3
+    1/2 *x.a1 *T^2 #*invfmGeV3
 end
 
 @inline @fastmath function pressure_derivative(T,μ,::Val{0},::Val{1},x::IdealQCD ) 
     
-    (2/4*x.a2 * T^2*μ +1/(3*2) *x.a3* μ^3 )*invfmGeV3
+    (2/4*x.a2 * T^2*μ +1/(3*2) *x.a3* μ^3 )#*invfmGeV3
 end
 
 @inline @fastmath function pressure_derivative(T,μ,::Val{0},::Val{2},x::IdealQCD ) 
     
-    (2/4*x.a2 * T^2 +1/(2) *x.a3* μ^2)*invfmGeV3
+    (2/4*x.a2 * T^2 +1/(2) *x.a3* μ^2)#*invfmGeV3
 end
 
 @inline @fastmath function pressure_derivative(T,μ,::Val{1},::Val{1},x::IdealQCD ) 
-    (x.a2 * T*μ )*invfmGeV3
+    (x.a2 * T*μ )#*invfmGeV3
 end
 
 

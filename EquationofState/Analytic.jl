@@ -51,3 +51,18 @@ function thermodynamic(T::A,mu::B,x::Gluing) where{A<:Number,B<:Number}
     N=promote_type(A,B)
     Thermodynamic{N,2,3}(x.f(T,mu),(zero(N),zero(N)),(zero(N),zero(N),zero(N)))
 end
+
+function thermodynamic(T::A,mu::B,t::C,x::Gluing) where{A<:Number,B<:Number,C<:Number}
+    N=promote_type(A,B,C)
+    Thermodynamic{N,2,3}(x.f(T,mu,t),(zero(N),zero(N)),(zero(N),zero(N),zero(N)))
+end
+
+function thermodynamicPhaseOne(T::A,mu::B,t::C,x::Gluing) where{A<:Number,B<:Number,C<:Number}
+    N=promote_type(A,B,C)
+    Thermodynamic{N,2,3}(x.f(T,mu,t),(zero(N),zero(N)),(zero(N),zero(N),zero(N)))
+end
+
+function thermodynamicPhaseOne(T::A,mu::B,x::Gluing) where{A<:Number,B<:Number}
+    N=promote_type(A,B)
+    Thermodynamic{N,2,3}(x.f(T,mu),(zero(N),zero(N)),(zero(N),zero(N),zero(N)))
+end

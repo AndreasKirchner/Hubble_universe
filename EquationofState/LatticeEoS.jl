@@ -66,7 +66,9 @@ end
 
 @inline function thermodynamic(T,Mu,x::LatticeQCD)
 
-
+    if T<0.0001
+        Thermodynamic(0.0,(0.0,0.0),(0.0,0.0,0.0))
+    else
     #Thermodynamic{T,2,3}(pressure(T,Mu,x),
     Thermodynamic(pressure(T,Mu,x),
         (pressure_derivative(T,Mu,Val{1}(),Val{0}(),x),
@@ -78,8 +80,13 @@ end
             pressure_derivative(T,Mu,Val{0}(),Val{2}(),x)
         )
     )
+    end
 
 end 
+
+function thermodynamic(T,Mu,t,x::LatticeQCD)
+    return thermodynamic(T,Mu,x)
+end
 
 #@inline lambda(T,Mu,x::EquationOfState)=lambda(T,Mu,x)
 #@inline lambda(T,Mu,x::FluidProperties)= lambda(T,Mu,x.equation_of_state)

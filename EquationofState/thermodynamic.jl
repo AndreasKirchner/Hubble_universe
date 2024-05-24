@@ -111,8 +111,8 @@ end
 
 @inline Base.:-(a::Thermodynamic{S,N,M},b::Number) where {S,N,M} = a+(-b)
 
- @inline function Base.:*(a::S,b::Thermodynamic{S,N,M}) where {S,N,M} 
-    Thermodynamic{S,N,M}(
+ @inline function Base.:*(a::T,b::Thermodynamic{S,N,M}) where {T,S,N,M} 
+    Thermodynamic{promote_type(T,S),N,M}(
     a*b.pressure,
     ntuple(i->a*b.pressure_derivative[i],Val(N)),
     ntuple(i->a*b.pressure_hessian[i],Val(M)))
@@ -125,7 +125,7 @@ end
     ntuple(i->a*b.pressure_hessian[i],Val(M)))
 end
 
-@inline Base.:+(a::Thermodynamic{S,N,M},b::Number) where {S,N,M} = b*a
+@inline Base.:*(a::Thermodynamic{S,N,M},b::Number) where {S,N,M} = b*a
 
 @inline Base.:/(a::Number,b::Thermodynamic{S,N,M}) where {S,N,M} = a*inv(b)
 

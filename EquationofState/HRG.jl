@@ -181,6 +181,7 @@ function thermodynamic(T,μ,x::HadronResonaceGas{L})  where {L}
         m=x[i].Mass
         reducemass=m/T
         Spin=x[i].Spin
+        #println(reducemass)
         
         if reducemass<500*one(T)
             if iseven(Spin*2)
@@ -195,9 +196,13 @@ function thermodynamic(T,μ,x::HadronResonaceGas{L})  where {L}
                     besslk1n=besselk1(n*reducemass)
                     #@show besslk0n
                     besslk2n=besslk0n+2/(n*reducemass)*besslk1n
-                    expn=exp(n* μ* QB/T )
+                    #@show besslk2n
+                    expn=exp(min(500,n* μ* QB/T ))
+                    #@show expn
             
                     pressure+=T^4/(2 *pi^2)* (reducemass)^2*(2*Spin+1)/n^2*expn*besslk2n 
+                    #@show T^4
+                    #@show pressure
                     p01+=(2*Spin+1)/(2 *pi^2*n)*expn*m^2*QB*T*besslk2n 
                     p10+= (2*Spin+1)/(2 *pi^2*n^2)*expn* m^2 * (
                     besslk2n *(4*T-μ*QB*n)+ 
@@ -220,9 +225,12 @@ function thermodynamic(T,μ,x::HadronResonaceGas{L})  where {L}
                     besslk0n=besselk0(n*reducemass)
                     besslk1n=besselk1(n*reducemass)
                     besslk2n=besslk0n+2/(n*reducemass)*besslk1n
-                    expn=exp(n* μ* QB/T )
+                    expn=exp(min(500,n* μ* QB/T) )
+                    #@show expn
+                    #@show besslk0n
             
                     pressure+= T^4 /(2 *pi^2)* (reducemass)^2* (2*Spin+1)/n^2*(-1)^(n+1) *expn *besslk2n 
+                    #@show pressure
                     p01+= (-1)^(n+1)*(2*Spin+1)/(2 *pi^2*n)*expn *besslk2n *m^2*QB*T
                     p10+= (-1)^(n+1)*(2*Spin+1)/(2 *pi^2*n^2)*expn * m^2 *(
                         besslk2n *(4*T-μ*QB*n)+ 
@@ -292,7 +300,7 @@ function thermodynamic(T,μ,x::HadronResonaceGasNew{L})  where {L}
                 besslk0n=besselk(0,n*reducemass)
                 besslk1n=besselk(1,n*reducemass)
                 besslk2n=besslk0n+2/(n*reducemass)*besslk1n
-                expn=exp(n* μ* QB/T )
+                expn=exp(min(500,n* μ* QB/T) )
             
                 pressure+=T^4/(2 *pi^2)* (reducemass)^2* degeneracy/n^2*expn*besslk2n 
                 p01+=degeneracy/(2 *pi^2*n)*expn*m^2*QB*T*besslk2n 
@@ -314,7 +322,7 @@ function thermodynamic(T,μ,x::HadronResonaceGasNew{L})  where {L}
                 besslk0n=besselk(0,n*reducemass)
                 besslk1n=besselk(1,n*reducemass)
                 besslk2n=besslk0n+2/(n*reducemass)*besslk1n
-                expn=exp(n* μ* QB/T )
+                expn=exp(min(500,n* μ* QB/T) )
             
                 pressure+= T^4 /(2 *pi^2)* (reducemass)^2* degeneracy/n^2*(-1)^(n+1) *expn *besslk2n 
                 p01+= (-1)^(n+1)*degeneracy/(2 *pi^2*n)*expn *besslk2n *m^2*QB*T
@@ -333,4 +341,12 @@ function thermodynamic(T,μ,x::HadronResonaceGasNew{L})  where {L}
         end
     end
     return Thermodynamic(pressure,(p10,p01),(p20,p11,p02))
+end
+
+function thermodynamic(T,μ,t,x::HadronResonaceGas{L})  where {L}
+    return  thermodynamic(T,μ,x)
+end
+
+function thermodynamic(T,μ,t,x::HadronResonaceGasNew{L})  where {L}
+    return  thermodynamic(T,μ,x)
 end

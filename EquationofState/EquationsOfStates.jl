@@ -6,7 +6,19 @@ const invfmGeV= 1/fmGeV
 const invfmGeV3=(1/fmGeV)^3
 using GSL
 
+#using SpecialFunctions
+#using Polylogarithms
 
+#push!(LOAD_PATH,pwd()*"/Polyloghack")
+#using PolylogarithmsHack
+
+#using Polyloghack
+
+include("Polyloghack/Polylogarithmshack.jl")
+
+using .PolylogarithmsHack: polylog
+
+#polylog(-0.5,.1)
 
 include("thermodynamic.jl")
 include("EquationofStatetype.jl")
@@ -18,13 +30,18 @@ include("IdealQCD.jl")
 include("FluiduMEoS.jl")
 include("HRG.jl")
 include("LatticeEoS.jl")
-include("Walecka.jl")
-include("Walecka_GSL_Massieu.jl")
+#include("Walecka.jl")
+#include("Walecka_GSL_Massieu.jl")
 include("simpletransport.jl")
 include("Analytic.jl")
 
-include("heavyquark.jl")
+include("NeuralNetworkEoS.jl")
+include("NeuralNetworkEoS_6out.jl")
+include("6_models.jl")
 
+include("heavyquark.jl")
+include("walecka_full.jl")
+include("glueDer.jl")
 """
 
     thermodynamic(T[,μ],x::EquationofState)
@@ -201,9 +218,12 @@ end
 function WaleckaModel1
 end
 
-export thermodynamic,pressure, pressure_derivative , TwoDPicewiseEquationOfState ,OneDPicewiseEquationOfState, energy_density
+function WaleckaModel2
+end
+
+export thermodynamic,pressure, pressure_derivative , TwoDPicewiseEquationOfState ,OneDPicewiseEquationOfState, energy_density, thermodynamicPhaseOne, thermodynamicPhaseTwo
 export FluidProperties, viscosity, τ_shear,bulk_viscosity,τ_bulk,diffusion,τ_diffusion
-export IdealQCD, FluiduMEoS, HadronResonaceGas,waleckacondition,LatticeQCD,WaleckaModel, HadronResonaceGasNew, LatticeQCD_Massieu, WaleckaModel1
+export IdealQCD, FluiduMEoS, HadronResonaceGas,waleckacondition,LatticeQCD, HadronResonaceGasNew, LatticeQCD_Massieu, WaleckaModel2, glueDer, NeuralNet, NeuralNet6, NeuralNet6M #, WaleckaModel2#,Walecka
 export SimpleBulkViscosity,SimpleShearViscosity,SimpleDiffusionCoefficient #why not export the zero viscosity stuff?
 export Analytic, Gluing,Thermodynamic, EquationOfState
 export Heavy_Quark, IdealQCDT, HQdiffusion, pressure_derivative, pressure, federica, QGPViscosity
@@ -220,5 +240,8 @@ Bessels.besselk1(d::Dual{T,V,N}) where {T,V,N} = Dual{T}(Bessels.besselk1(value(
 
 GSL.sf_fermi_dirac_3half(d::Dual{T,V,N}) where {T,V,N} = Dual{T}(GSL.sf_fermi_dirac_3half(value(d)),GSL.sf_fermi_dirac_half(value(d)) * partials(d))
 GSL.sf_fermi_dirac_half(d::Dual{T,V,N}) where {T,V,N} = Dual{T}(GSL.sf_fermi_dirac_half(value(d)),GSL.sf_fermi_dirac_mhalf(value(d)) * partials(d))
+GSL.sf_fermi_dirac_mhalf(d::Dual{T,V,N}) where {T,V,N} = Dual{T}(GSL.sf_fermi_dirac_mhalf(value(d)),real(-polylog(-1/2,-exp(value(d)))) * partials(d))
+
+
 
 end

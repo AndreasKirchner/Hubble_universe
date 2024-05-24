@@ -155,3 +155,5 @@ end
 
 
 thermodyanmics(T,mu,wal::FluidProperties) = thermodyanmics(T,mu,wal.equation_of_state)
+
+thermodyanmics(T,mu,t,wal::FluidProperties) = thermodyanmics(T,mu,t,wal.equation_of_state)
