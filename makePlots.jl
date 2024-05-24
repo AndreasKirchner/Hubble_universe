@@ -67,10 +67,10 @@ check_for_transition(T0,mu0)
 u0=[T0,mu0,0.0,.0]
 tspan=(0.015,.04)
 
-(du,u,p,t)=get_source(du,u,t,fullEOS,Walecka2,0.2,gammaA,1/50)
+f(du,u,p,t)=get_source(du,u,t,fullEOS,Walecka2,0.2,gammaA,1/50)
 problem = ODEProblem(f, u0, tspan)
 solution1 = solve(problem,AutoTsit5(Rosenbrock23(autodiff=false)),dtmax=0.001*(tspan[2]-tspan[1]))
-
+plot(solution1)
 #functions for entropy etc 
 
 function maxT(zetaMax)
@@ -138,32 +138,6 @@ function entropyProductionb(sol,t,gammaE,beta1,zetaMax)
     #return -piB*(dPi/5+3/10*piB*Hrat+3*Hrat)#3*Hrat*piB+3*Hrat*T*s
     return b
 end
-
-function trapezoidal_rule(x, fx)
-    n = length(x)
-    if n != length(fx)
-    error("Length of x and fx should be the same")
-    end
-    
-    integral = 0.0
-    for i in 1:n-1
-    h = x[i+1] - x[i]
-    integral += (fx[i] + fx[i+1]) * h / 2
-    end
-    
-    return integral
-    end
-
-    function entro(gammaE,mexzeta,beta1)
-        T0=0.005
-        mu0=.92
-        u0=[T0,mu0,0.0,0.0]
-        fT(du,u,p,t)=get_source(du,u,t,fullEOS,Walecka2,mexzeta,gammaE,beta1)
-        problemT = ODEProblem(fT, u0, tspan)
-        solutionT = solve(problemT,AutoTsit5(Rosenbrock23()),dtmax=0.01*tspan[2])
-        entroT=entropyProduction.(Ref(solutionT),solutionT.t,Ref(gammaE),Ref(beta1),Ref(mexzeta))
-        return trapezoidal_rule(solutionT.t,entroT)
-    end
     
     function entroMax(gammaE,mexzeta,beta1)
         T0=0.005
