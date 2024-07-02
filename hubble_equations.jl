@@ -89,10 +89,14 @@ function doLandauMatchingBig(t,z,vel)
     nRight=eRight/μ0
 
 
-    diffusionCurrent=gamma^2*(gammaLeft*vLeft*nLeft+gammaRight*vRight*nRight-velocity*(gammaLeft*nLeft+gammaRight*nRight))
-    numberDensity=1/gamma*(gammaLeft*nLeft+gammaRight*nRight-velocity*diffusionCurrent)
+    diffusionCurrent=(nLeft*(velocity-vLeft)*gammaLeft+nRight*(velocity-vRight)*gammaRight)/(-1+velocity^2)#gamma^2*(gammaLeft*vLeft*nLeft+gammaRight*vRight*nRight-velocity*(gammaLeft*nLeft+gammaRight*nRight))
+    numberDensity=(nRight*(velocity*vRight-1)*gammaRight+nLeft*(velocity*vLeft-1)*gammaLeft)/(gamma*(-1+velocity^2))#1/gamma*(gammaLeft*nLeft+gammaRight*nRight-velocity*diffusionCurrent)
 
-    return [numberDensity,energy,velocity,diffusionCurrent]
+    pizz=2/(3*velocity^2)*((eLeft+eRight)/(1-vRight^2)-energy/(1-velocity^2))
+    piBulk=((1-velocity^2)*(eLeft+eRight)-(1-vRight^2)*energy)/(3*velocity^2*(1-vRight^2))
+
+    return [numberDensity,energy,velocity,diffusionCurrent,pizz,piBulk]
+    
 end
 
 function doLandauMatchingTMu(t,z,vel)
@@ -288,7 +292,7 @@ function get_source_no_transition(du,u,time,x,zetaMax,gammaE,beta1)
     #viscosity
     zetaParam=dtp/(1+((sqrt(T^2+0.188172^2*mu^2)-0.175)/0.024)^2)
     zeta=zetaMax*zetaParam#dtp*zetaMax/(1+((sqrt(T^2+0.188172^2*mu^2)-0.175)/0.024)^2)
-    tauB=2*beta1*zetaParam#zeta/(5)
+    tauB=2*1/beta1*zeta/((energy+p))#2*beta1*zetaParam#zeta/(5)
     #hubble rate
     #hrate=10*sin(100*pi*time)#get_hubble_rate(gamma=gammaE)
     hrate=get_hubble_rate(gamma=gammaE)
@@ -355,7 +359,7 @@ function get_source_transition(du,u,time,x,zetaMax,gammaE,beta1)
     #viscosity
     zetaParam=dtp/(1+((sqrt(T^2+0.188172^2*mu^2)-0.175)/0.024)^2)
     zeta=zetaMax*zetaParam
-    tauB=2*beta1*zetaParam
+    tauB=2*beta1*zeta/(energy+p)#2*beta1*zetaParam
     #hubble rate
     hrate=get_hubble_rate(gamma=gammaE)
     H=hrate(time)

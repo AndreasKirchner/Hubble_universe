@@ -39,11 +39,95 @@ end
 transferFunction2=Gluing(fTrans2)
 
 highEOS=1/2*(1-transferFunction2)*HRG+1/2*(1+transferFunction2)*LQCD
-fullEOS=fmGeV^3*(highEOS)#+Walecka2)
+fullEOS=highEOS#fmGeV^3*(highEOS)#+Walecka2)
 fluidproperties=FluidProperties(fullEOS
 ,EquationsOfStates.ZeroViscosity()
 ,EquationsOfStates.ZeroBulkViscosity()
 ,EquationsOfStates.ZeroDiffusion())
+
+Tlist=collect(0:0.01:3)
+muOverT1=0
+muList1=muOverT1 .* Tlist
+pList1=zeros(length(Tlist))
+muOverT2=1
+muList2=muOverT2 .* Tlist
+pList2=zeros(length(Tlist))
+muOverT3=2
+muList3=muOverT3 .* Tlist
+pList3=zeros(length(Tlist))
+
+pList4=zeros(length(Tlist))
+muList4=collect(0.75:0.0001:0.95)
+pList4 = pressure.(Ref(0.0),muList4,Ref(fmGeV^3*(Walecka2+HRGLow)))
+pList5=zeros(length(Tlist))
+pList5 = pressure.(Ref(0.01),muList4,Ref(fmGeV^3*(Walecka2+HRGLow)))
+pList6=zeros(length(Tlist))
+pList6 = pressure.(Ref(0.025),muList4,Ref(fmGeV^3*(Walecka2+HRGLow)))
+plot(muList4,pList4 )
+plot!(muList4,pList5 )
+plot!(muList4,pList6 )
+
+pressure(0.0,0.9,HRGLow)
+
+
+fig=with_theme(theme_latexfonts()) do
+    fig = Figure(size = (xsize, ysize))
+    ax = Axis(fig[1, 1],
+    xlabel=L"\mu_\text{B} \;[\mathrm{GeV}]",#,ylabel = L"The y label"
+    ylabel=L"p \; [\mathrm{MeV}/\mathrm{fm}^3]"
+    ,xgridvisible = false,
+        ygridvisible = false
+)
+CairoMakie.ylims!(ax,-0.01,3)
+CairoMakie.xlims!(ax,0.75,0.94)
+    lines!(ax, muList4,10^3 .*pList4,label=L"0 ",color=Makie.wong_colors()[1])
+    lines!(ax, muList4, 10^3 .*pList5 ,label=L"10 ",color=Makie.wong_colors()[2])
+    lines!(ax, muList4, 10^3 .*pList6 ,label=L"25 ",color=Makie.wong_colors()[4])
+    axislegend(L"T\; [\mathrm{MeV}]", framevisible=false,position=:lt)
+    
+    #text!(-0.015,0.3, text=L"\frac{\nu}{\gamma n_0}")
+    resize_to_layout!(fig)
+    fig
+end
+#save("LowEOSPlot.pdf",fig)
+
+
+
+for i in eachindex(Tlist)
+    pList1[i]=pressure(Tlist[i],muList1[i],fullEOS)/Tlist[i]^4
+    pList2[i]=pressure(Tlist[i],muList2[i],fullEOS)/Tlist[i]^4
+    pList3[i]=pressure(Tlist[i],muList3[i],fullEOS)/Tlist[i]^4
+end
+
+plot(Tlist,pList1)
+plot!(Tlist,pList2)
+plot!(Tlist,pList3)
+
+using CairoMakie 
+xsize=300
+ysize=xsize*3/4
+
+fig=with_theme(theme_latexfonts()) do
+    fig = Figure(size = (xsize, ysize))
+    ax = Axis(fig[1, 1],
+    xlabel=L"T \;[\mathrm{GeV}]",#,ylabel = L"The y label"
+    ylabel=L"p/T^4"
+    ,xgridvisible = false,
+        ygridvisible = false
+)
+    CairoMakie.ylims!(ax,0.0,6)
+    CairoMakie.xlims!(ax,0.0,3)
+    lines!(ax, Tlist, pList1,label=L"0 ",color=Makie.wong_colors()[1])
+    lines!(ax, Tlist, pList2,label=L"1 ",color=Makie.wong_colors()[2])
+    lines!(ax, Tlist, pList3 ,label=L"2",color=Makie.wong_colors()[3])
+    axislegend(L"\mu_\text{B}/T", framevisible=false, position=:rb)
+    
+    #text!(-0.015,0.3, text=L"\frac{\pi^{zz}}{\gamma^2 \epsilon_0}")
+    resize_to_layout!(fig)
+    fig
+end
+
+save("pOverT4.pdf",fig)
 
 gammaA=2960
 hrate=get_hubble_rate(gamma=gammaA)
@@ -76,14 +160,6 @@ problem = ODEProblem(f, u0, tspan)
 #@time solution4 = solve(problem,AutoTsit5(Rodas5P(autodiff=false)))
 @time solution1 = solve(problem,AutoTsit5(Rodas4(autodiff=false)))
 plotSol(solution1)
-
-p=pressure.(solution1[1,:],solution1[2,:],Ref(fullEOS))
-n=pressure_derivative.(solution1[1,:],abs.(solution1[2,:]),Val(0),Val(1),Ref(fullEOS))
-
-plot(solution1.t,n)
-
-
-plot(solution1.t,abs.(solution1[2,:]))
 
 @time 1+1
 
@@ -118,6 +194,40 @@ plot!((first(solution1[2,:]),first(solution1[1,:])),marker=:circ,mc=:black,marke
 #savefig(pdplot,"PlotsPaper/phaseDiagramPoints.pdf")
 (last(solution1[2,:]),last(solution1[1,:]))
 minimum(solution1[2,:])
+
+using LaTeXStrings
+using CairoMakie 
+xsize=300
+ysize=xsize*3/4
+fig=with_theme(theme_latexfonts()) do
+    fig = Figure(size = (xsize, ysize))
+    ax = Axis(fig[1, 1],yscale = log10,
+    xlabel=L"\mu \; \;[\mathrm{GeV}]",#,ylabel = L"The y label"
+    ylabel=L"\mathrm{ln}[T/\mathrm{GeV}]"
+    ,xgridvisible = false,
+        ygridvisible = false
+)
+    CairoMakie.ylims!(ax,2.5*10^(-3),4.0)
+    CairoMakie.xlims!(ax,-0.02,0.96)
+    lines!(abs.(solution1[2,:]),solution1[1,:],label=L"0 ",color=Makie.wong_colors()[1])
+    CairoMakie.scatter!(last(solution1[2,:]),last(solution1[1,:]),marker=:circ,color=:black,markersize = 8)
+    CairoMakie.scatter!(first(solution1[2,:]),first(solution1[1,:]),marker=:circ,color=:black,markersize = 8)
+    text!(0.94, 0.0045, text = "I", align = (:center, :center))
+    text!(0.038, 0.95, text = "II", align = (:center, :center))
+    #point((last(solution1[2,:]),last(solution1[1,:])),marker=:circ,mc=:black,markersize = 6)
+    #plot!((first(solution1[2,:]),first(solution1[1,:])),marker=:circ,mc=:black,markersize = 6)
+    #lines!(ax, Tlist, pList2,label=L"1 ",color=Makie.wong_colors()[2])
+    #lines!(ax, Tlist, pList3 ,label=L"2",color=Makie.wong_colors()[3])
+    #axislegend(L"\mu_\text{B}/T", framevisible=false, position=:rb)
+    
+    #text!(-0.015,0.3, text=L"\frac{\pi^{zz}}{\gamma^2 \epsilon_0}")
+    resize_to_layout!(fig)
+    fig
+end
+
+save("phaseDiagFinal.pdf",fig)
+
+
 
 #functions for entropy etc 
 
@@ -301,8 +411,7 @@ plot!(gammaList,entroGamma3,label=L"20")
 plot!(gammaList,entroGamma4,label=L"50")
 #savefig(entroGammaPlot,"PlotsPaper/totalEntroGamma.pdf")
 
-solt=getSol(gammaList[1],1,2)
-plotSol(solt)
+solt=getSol(gammaList[20],1,2)
 
 plot(solt.t,solt[1,:])
 plot!(solt.t,solt[2,:])
@@ -348,30 +457,3 @@ plot!(sol3[2,:],sol3[1,:],label="50")
 last(sol1[1,:])
 last(sol2[1,:])
 last(sol3[1,:])
-
-
-
-hrate=get_hubble_rate()
-gamma=2960
-v=sqrt(1-1/gamma^2)
-rList=collect(-0.03:0.0005:0.03)
-
-
-
-nlist=zeros(length(rList))
-elist=zeros(length(rList))
-vlist=zeros(length(rList))
-nulist=zeros(length(rList))
-
-t=0.03
-for i in eachindex(rList)
-    nlist[i]=doLandauMatchingBig(t,rList[i],v)[1]
-    vlist[i]=doLandauMatchingBig(t,rList[i],v)[3]
-    elist[i]=doLandauMatchingBig(t,rList[i],v)[2]
-    nulist[i]=doLandauMatchingBig(t,rList[i],v)[4]
-end
-
-plot(nulist)
-plot!(30 .*nlist)
-    plot(vlist)
-plot(elist)
